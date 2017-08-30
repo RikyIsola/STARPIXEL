@@ -240,6 +240,7 @@ public class Gioco extends Gruppo
 								try
 								{
 									Blocco b=Gioco.this.schermo().blocchi.blocchi[Integer.valueOf(secondo)];
+									if(b==Gioco.this.schermo().blocchi.Giocatore)Gioco.this.schermo().toast("ARRIVO GIOCATORE");
 									double x=Double.valueOf(terzo);
 									double y=Double.valueOf(quarto);
 									int chunkX=Integer.valueOf(quinto);
@@ -313,6 +314,7 @@ public class Gioco extends Gruppo
 									int chunkY=Integer.valueOf(quarto);
 									double x=Double.valueOf(quinto);
 									double y=Double.valueOf(sesto);
+									if(b==Gioco.this.schermo().blocchi.Giocatore)schermo().toast(chunkX+" "+chunkY+" "+x+" "+y);
 									double arrivo=Double.valueOf(messaggio.toString());
 									for(ChunkLan c:chunk)if(c.x==chunkX&&c.y==chunkY)
 										{

@@ -190,19 +190,20 @@ public class Lista<T>extends ArrayList<T>
 	}
 	public Lista(){}
 	public Lista(int n){super(n);}
+	public Lista(Collection<? extends T>n){super(n);}
 	public Iterator iterator()
 	{
 		return new Iterator()
 		{
-			int n=0;
+			int n=size();
 			public boolean hasNext()
 			{
-				return n<size();
+				return size()-n<size();
 			}
 			public Object next()
 			{
-				Object o=get(n);
-				n++;
+				Object o=get(size()-n);
+				n--;
 				return o;
 			}
 			public void remove(){}

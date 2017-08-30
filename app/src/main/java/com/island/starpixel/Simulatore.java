@@ -224,8 +224,10 @@ public class Simulatore
 															}
 														}
 														Generatore.controllo(Simulatore.this);
+														schermo.toast("finito controllo "+giocatori.get(0).c.visibili.size());
 													}
 												});
+											schermo.toast("finito ricezione");
 										}
 									}
 								});

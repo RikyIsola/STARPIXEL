@@ -131,17 +131,23 @@ public class Comandi extends Finestra
 			suoni=suoni.rilascia();
 			new Suono(schermo(),R.raw.litewave_powerdown).start();
 		}
-		if(sensori!=null)for(ChunkLan chunk:gioco.chunk)
+		if(sensori!=null)for(final ChunkLan chunk:gioco.chunk)
 		{
 			if(chunk.getLayoutParams()!=null)
 			{
 				chunk.migra(gioco);
-				chunk.setOnTouchListener(gioco.touch());
 				chunk.antiScroll(true,true);
 				chunk.antiPiu(false);
 				chunk.max(blocchi.vista,blocchi.vista);
-				chunk.removeView(chunk.copertura);
 				chunk.copertura=null;
+				schermo().runOnUiThread(new Runnable()
+				{
+					public void run()
+					{
+						chunk.setOnTouchListener(gioco.touch());
+						chunk.removeView(chunk.copertura);
+					}
+				});
 			}
 		}
 		gioco.superordine=true;

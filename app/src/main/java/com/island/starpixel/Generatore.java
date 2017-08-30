@@ -509,22 +509,11 @@ public class Generatore
 				c.salva(c.s.blocchi);
 				s.chunk=Lista.rimuovi(s.chunk,c);
 			}
-			Lista<Socket>avanzi=c.cache;
+			Lista<Socket>avanzi=new Lista<Socket>(c.cache);
 			Lista<Socket>fuori=new Lista<Socket>();
 			for(Socket soc:c.visibili)
 			{
-				try
-				{
-					avanzi=Lista.rimuovi(avanzi,soc);
-				}
-				catch(ArrayIndexOutOfBoundsException e)
-				{
-					fuori=Lista.aggiungi(fuori,soc);
-				}
-				catch(NegativeArraySizeException e)
-				{
-					fuori=Lista.aggiungi(fuori,soc);
-				}
+				if(!avanzi.remove(soc))fuori=Lista.aggiungi(fuori,soc);
 			}
 			c.visibili=c.cache;
 			c.cache=new Lista<Socket>();

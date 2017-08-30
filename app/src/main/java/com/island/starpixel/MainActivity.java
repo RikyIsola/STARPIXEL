@@ -82,11 +82,11 @@ public class MainActivity extends Schermo
 	}
 	public boolean debug()
 	{
-		return true;
+		return false;
 	}
 	public boolean suoni()
 	{
-		return false;
+		return true;
 	}
 	public boolean immagini()
 	{
@@ -113,7 +113,6 @@ public class MainActivity extends Schermo
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		toast(""+Lista.arrotonda(120.987654321,2));
 		//server.schermo(this);
 		font(Typeface.SERIF,Typeface.BOLD_ITALIC);
 		int[]dim=dimensioni();
@@ -163,7 +162,6 @@ public class MainActivity extends Schermo
 			public void onClick(View p1)
 			{
 				new Menu(schermo());
-				toast(""+finestre.size());
 			}
 		};
 	}

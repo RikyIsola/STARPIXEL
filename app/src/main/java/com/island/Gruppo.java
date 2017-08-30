@@ -236,11 +236,12 @@ public class Gruppo extends ViewGroup
 			info.altezza=altezza();
 			info.unitaX=gruppo.unitaX;
 			info.unitaY=gruppo.unitaY;
+			final Gruppo g=this.gruppo;
 			schermo.runOnUiThread(new Runnable()
 				{
 					public void run()
 					{
-						Gruppo.this.gruppo.removeView(Gruppo.this);
+						g.removeView(Gruppo.this);
 						gruppo.addView(Gruppo.this);
 					}
 				}
