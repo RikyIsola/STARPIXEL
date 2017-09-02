@@ -3,10 +3,9 @@ import android.os.*;
 import android.view.*;
 import com.island.*;
 import com.island.starpixel.blocchi.*;
+import com.island.starpixel.blocchi.solidi.mobili.ai.intelligenti.*;
 import com.island.starpixel.blocchi.terreni.*;
-import java.io.*;
 import java.net.*;
-import java.util.*;
 public class Gioco extends Gruppo
 {
 	Lan lan;
@@ -19,9 +18,22 @@ public class Gioco extends Gruppo
 	private String server;
 	Schermata s;
 	private String cartella;
+	private Suono musica;
+	private Processo processo=new Processo()
+	{
+		public void esegui()
+		{
+			loop();
+		}
+		public void sempre()
+		{
+			sempreGrafico();
+		}
+	}.riprendi();
 	Gioco(Schermata s,Gruppo gruppo,double x,double y,double larghezza,double altezza,String server,String cartella,boolean host,boolean primo)
 	{
 		super(gruppo,x,y,larghezza,altezza,10,10);
+		if(primo)musica=new Suono(schermo(),schermo().blocchi.pace(schermo().blocchi.normale)).start().infinito(true);
 		this.primo=primo;
 		this.cartella=cartella;
 		this.s=s;
@@ -52,9 +64,8 @@ public class Gioco extends Gruppo
 			boolean inventario;
 			boolean banca;
 			String primo,secondo,terzo,quarto,quinto,sesto;
-			public void leggi(final StringBuilder mess,Socket socket)
+			public void leggi(StringBuilder messaggio,Socket socket)
 			{
-				String messaggio=mess.toString();
 				if(Gioco.this.schermo()!=null)
 				{
 					try
@@ -62,12 +73,12 @@ public class Gioco extends Gruppo
 						if(inventario)
 						{
 							while(!(schermo().finestra()instanceof Inventario));
-							if(messaggio.equals(Gioco.this.schermo().blocchi.fine))
+							if(Lista.uguali(messaggio,Gioco.this.schermo().blocchi.fine))
 							{
 								inventario=false;
 								((Inventario)schermo().finestra()).finito();
 							}
-							else((Inventario)schermo().finestra()).aggiungi(Integer.valueOf(messaggio.toString()));
+							else((Inventario)schermo().finestra()).aggiungi(Lista.toInt(messaggio));
 						}
 						else if(banca)
 						{
@@ -76,7 +87,7 @@ public class Gioco extends Gruppo
 							else if(terzo==null)terzo=messaggio.toString();
 							else
 							{
-								if(messaggio.equals(Gioco.this.schermo().blocchi.fine))
+								if(Lista.uguali(messaggio,Gioco.this.schermo().blocchi.fine))
 								{
 									banca=false;
 									schermo().runOnUiThread(new Runnable()
@@ -108,8 +119,8 @@ public class Gioco extends Gruppo
 						}
 						else if(primo==null)
 						{
-							if(messaggio.equals(Gioco.this.schermo().blocchi.inventariolan))inventario=true;
-							else if(messaggio.equals(Gioco.this.schermo().blocchi.ripristino))
+							if(Lista.uguali(messaggio,Gioco.this.schermo().blocchi.inventariolan))inventario=true;
+							else if(Lista.uguali(messaggio,Gioco.this.schermo().blocchi.ripristino))
 							{
 								collega().onClick(null);
 								try
@@ -122,7 +133,7 @@ public class Gioco extends Gruppo
 								}
 								collega().onClick(null);
 							}
-							else if(messaggio.equals(Gioco.this.schermo().blocchi.banca))
+							else if(Lista.uguali(messaggio,Gioco.this.schermo().blocchi.banca))
 							{
 								schermo().runOnUiThread(new Runnable()
 									{
@@ -133,7 +144,7 @@ public class Gioco extends Gruppo
 									});
 								banca=true;
 							}
-							else if(messaggio.equals(Gioco.this.schermo().blocchi.comandi))
+							else if(Lista.uguali(messaggio,Gioco.this.schermo().blocchi.comandi))
 							{
 								schermo().runOnUiThread(new Runnable()
 									{
@@ -143,7 +154,7 @@ public class Gioco extends Gruppo
 										}
 									});
 							}
-							else if(messaggio.equals(Gioco.this.schermo().blocchi.fine))
+							else if(Lista.uguali(messaggio,Gioco.this.schermo().blocchi.fine))
 							{
 								finito=true;
 								superordine=true;
@@ -154,7 +165,7 @@ public class Gioco extends Gruppo
 						{
 							if(primo.equals(Gioco.this.schermo().blocchi.selezionato))
 							{
-								selezionato.immagine(Gioco.this.schermo().blocchi.blocchi[Integer.valueOf(messaggio.toString())].immagine());
+								selezionato.immagine(Gioco.this.schermo().blocchi.blocchi[Lista.toInt(messaggio)].immagine());
 								primo=null;
 							}
 							else secondo=messaggio.toString();
@@ -164,7 +175,7 @@ public class Gioco extends Gruppo
 							if(primo.equals(Gioco.this.schermo().blocchi.eliminachunk))
 							{
 								int x=Integer.valueOf(secondo);
-								int y=Integer.valueOf(messaggio.toString());
+								int y=Lista.toInt(messaggio);
 								for(final ChunkLan c:chunk)if(c.x==x&&c.y==y)
 									{
 										for(EntitaLan e:c.entita)e.rimosso();
@@ -199,7 +210,7 @@ public class Gioco extends Gruppo
 							{
 								int chunkX=Integer.valueOf(secondo);
 								int chunkY=Integer.valueOf(terzo);
-								int luce=Integer.valueOf(messaggio.toString());
+								int luce=Lista.toInt(messaggio);
 								ChunkLan trovato=null;
 								for(ChunkLan c:chunk)if(c.x==chunkX&&c.y==chunkY)trovato=c;
 								if(trovato!=null)trovato.luce=luce;
@@ -216,14 +227,14 @@ public class Gioco extends Gruppo
 								int x=Integer.valueOf(secondo);
 								int y=Integer.valueOf(terzo);
 								String stato=quarto;
-								int dimensione=Integer.valueOf(messaggio.toString());
+								int dimensione=Lista.toInt(messaggio);
 								final ChunkLan c=new ChunkLan(Gioco.this,x,y,stato,Gioco.this,dimensione);
 								chunk=Lista.aggiungi(chunk,c);
 								schermo().runOnUiThread(new Runnable()
 								{
 									public void run()
 									{
-										c.setOnTouchListener(touch());
+										c.setOnTouchListener(touch);
 									}
 								});
 								primo=null;
@@ -240,11 +251,10 @@ public class Gioco extends Gruppo
 								try
 								{
 									Blocco b=Gioco.this.schermo().blocchi.blocchi[Integer.valueOf(secondo)];
-									if(b==Gioco.this.schermo().blocchi.Giocatore)Gioco.this.schermo().toast("ARRIVO GIOCATORE");
 									double x=Double.valueOf(terzo);
 									double y=Double.valueOf(quarto);
 									int chunkX=Integer.valueOf(quinto);
-									int chunkY=Integer.valueOf(messaggio.toString());
+									int chunkY=Lista.toInt(messaggio);
 									for(ChunkLan c:chunk)if(c.x==chunkX&&c.y==chunkY)new EntitaLan(c,x,y,b);
 								}
 								catch(NumberFormatException e)
@@ -265,7 +275,7 @@ public class Gioco extends Gruppo
 									int chunkX=Integer.valueOf(terzo);
 									int chunkY=Integer.valueOf(quarto);
 									double x=Double.valueOf(quinto);
-									double y=Double.valueOf(messaggio.toString());
+									double y=Lista.toDouble(messaggio);
 									for(final ChunkLan c:chunk)if(c.x==chunkX&&c.y==chunkY)
 										{
 											for(final EntitaLan e:c.entita)if(e.b==b&&e.x()==x&&e.y()==y)
@@ -314,8 +324,8 @@ public class Gioco extends Gruppo
 									int chunkY=Integer.valueOf(quarto);
 									double x=Double.valueOf(quinto);
 									double y=Double.valueOf(sesto);
-									if(b==Gioco.this.schermo().blocchi.Giocatore)schermo().toast(chunkX+" "+chunkY+" "+x+" "+y);
-									double arrivo=Double.valueOf(messaggio.toString());
+									double arrivo=Lista.toDouble(messaggio);
+									arrivo=Double.valueOf(messaggio.toString());
 									for(ChunkLan c:chunk)if(c.x==chunkX&&c.y==chunkY)
 										{
 											for(EntitaLan e:c.entita)if(e.b==b&&e.x()==x&&e.y()==y)
@@ -344,7 +354,7 @@ public class Gioco extends Gruppo
 								int chunkY=Integer.valueOf(quarto);
 								double x=Double.valueOf(quinto);
 								double y=Double.valueOf(sesto);
-								int arrivo=Integer.valueOf(messaggio.toString());
+								int arrivo=Lista.toInt(messaggio);
 								for(ChunkLan c:chunk)if(c.x==chunkX&&c.y==chunkY)
 									{
 										for(EntitaLan e:c.entita)if(e.b==b&&e.x()==x&&e.y()==y)
@@ -370,7 +380,8 @@ public class Gioco extends Gruppo
 									int chunkY=Integer.valueOf(quarto);
 									double x=Double.valueOf(quinto);
 									double y=Double.valueOf(sesto);
-									double arrivo=Double.valueOf(messaggio.toString());
+									double arrivo=Lista.toDouble(messaggio);
+									arrivo=Double.valueOf(messaggio.toString());
 									for(ChunkLan c:chunk)if(c.x==chunkX&&c.y==chunkY)
 										{
 											for(EntitaLan e:c.entita)if(e.b==b&&e.x()==x&&e.y()==y)
@@ -399,7 +410,7 @@ public class Gioco extends Gruppo
 								int chunkY=Integer.valueOf(quarto);
 								double x=Double.valueOf(quinto);
 								double y=Double.valueOf(sesto);
-								int arrivo=Integer.valueOf(messaggio.toString());
+								int arrivo=Lista.toInt(messaggio);
 								for(ChunkLan c:chunk)if(c.x==chunkX&&c.y==chunkY)
 									{
 										for(EntitaLan e:c.entita)if(e.b==b&&e.x()==x&&e.y()==y)
@@ -493,39 +504,72 @@ public class Gioco extends Gruppo
 	public void sempre()
 	{
 		if(simulatore!=null)simulatore.sempre();
+	}
+	public void sempreGrafico()
+	{
+		if(musica!=null)
+		{
+			boolean esci=false;
+			for(ChunkLan c:chunk)
+			{
+				for(EntitaLan e:c.entita)
+				{
+					if(e.b instanceof Intelligente)
+					{
+						Intelligente i=(Intelligente)e.b;
+						if(i.team(schermo().blocchi)!=0)
+						{
+							esci=true;
+							if(!i.boss())
+							{
+								if(schermo().blocchi.pace(musica.suono(),e.chunk.dimensione)||schermo().blocchi.pace(musica.suono(),schermo().blocchi.normale))
+								{
+									musica.rilascia();
+									musica=new Suono(schermo(),Blocchi.battaglia()).start().infinito(true);
+								}
+							}
+							else
+							{
+								if(schermo().blocchi.pace(musica.suono(),e.chunk.dimensione)||Blocchi.battaglia(musica.suono()))
+								{
+									musica.rilascia();
+									musica=new Suono(schermo(),Blocchi.boss()).start().infinito(true);
+									break;
+								}
+							}
+						}
+					}
+				}
+				if(esci)break;
+			}
+			int dimensione;
+			if(tu!=null)dimensione=tu.chunk.dimensione;
+			else dimensione=schermo().blocchi.normale;
+			if(!esci&&(Blocchi.battaglia(musica.suono())||Blocchi.boss(musica.suono())||!schermo().blocchi.pace(musica.suono(),dimensione)))
+			{
+				musica.rilascia();
+				musica=new Suono(schermo(),schermo().blocchi.pace(dimensione)).start().infinito(true);
+			}
+		}
+		
 		if(s.libero()&&tu!=null)
 		{
 			//tu.chunk.sempre();
 			for(EntitaLan e:tu.chunk.entita)e.sempre();
 		}
-	}
-	public void sempreGrafico()
-	{
 		if(s.libero())
 		{
 			if(tu!=null)tu.chunk.sempre();
 			if(superordine&&tu!=null)
 			{
-				for(ChunkLan c:chunk)c.setVisibility(View.INVISIBLE);
-				tu.chunk.setVisibility(View.VISIBLE);
-				su.bringToFront();
-				giu.bringToFront();
-				destra.bringToFront();
-				sinistra.bringToFront();
+				schermo().runOnUiThread(superordiner);
 				superordine=false;
 			}
 			if(ordine&&tu!=null)
 			{
 				try
 				{
-					for(int a=0;a<tu.chunk.getChildCount();a++)
-					{
-						View v=tu.chunk.getChildAt(a);
-						if(v instanceof EntitaLan)
-						{
-							if(!(((EntitaLan)v).b instanceof Terreno))v.bringToFront();
-						}
-					}
+					schermo().runOnUiThread(ordiner);
 				}
 				catch(NullPointerException e)
 				{
@@ -537,22 +581,25 @@ public class Gioco extends Gruppo
 			{
 				tu.chunk.trans(tu.x()-schermo().blocchi.vista/2,tu.y()-schermo().blocchi.vista/2);
 			}
-			aggiorna();
 		}
 	}
 	public void onStop()
 	{
 		if(simulatore!=null)simulatore.stop();
+		processo.chiudi();
+		if(musica!=null)musica.rilascia();
 		lan.fine();
 	}
 	public void pausa()
 	{
 		if(simulatore!=null)simulatore.pausa();
+		processo.pausa();
 		lan.pausa();
 	}
 	public void riprendi()
 	{
 		if(simulatore!=null)simulatore.riprendi();
+		processo.riprendi();
 		lan.riprendi();
 	}
 	private void touch(MotionEvent e,int n)
@@ -568,26 +615,23 @@ public class Gioco extends Gruppo
 			lan.manda(String.valueOf(n));
 		}
 	}
-	View.OnTouchListener touch()
+	View.OnTouchListener touch=new View.OnTouchListener()
 	{
-		return new View.OnTouchListener()
+		public boolean onTouch(View p1,MotionEvent p2)
 		{
-			public boolean onTouch(View p1,MotionEvent p2)
+			if(p2.getAction()==MotionEvent.ACTION_DOWN)
 			{
-				if(p2.getAction()==MotionEvent.ACTION_DOWN)
-				{
-					Gruppo g=(Gruppo)p1;
-					double x=p2.getX()/g.unitaX()+g.transX();
-					double y=p2.getY()/g.unitaY()+g.transY();
-					lan.manda(Gioco.this.schermo().blocchi.iniziotocco);
-					lan.manda(String.valueOf(Lista.arrotonda(x,2)));
-					lan.manda(String.valueOf(Lista.arrotonda(y,2)));
-				}
-				else if(p2.getAction()==MotionEvent.ACTION_UP)lan.manda(Gioco.this.schermo().blocchi.finetocco);
-				return true;
+				Gruppo g=(Gruppo)p1;
+				double x=p2.getX()/g.unitaX()+g.transX();
+				double y=p2.getY()/g.unitaY()+g.transY();
+				lan.manda(Gioco.this.schermo().blocchi.iniziotocco);
+				lan.manda(String.valueOf(Lista.arrotonda(x,2)));
+				lan.manda(String.valueOf(Lista.arrotonda(y,2)));
 			}
-		};
-	}
+			else if(p2.getAction()==MotionEvent.ACTION_UP)lan.manda(Gioco.this.schermo().blocchi.finetocco);
+			return true;
+		}
+	};
 	private View.OnClickListener inventario()
 	{
 		return new View.OnClickListener()
@@ -622,4 +666,30 @@ public class Gioco extends Gruppo
 			}
 		};
 	}
+	private Runnable superordiner=new Runnable()
+	{
+		public void run()
+		{
+			for(ChunkLan c:chunk)c.setVisibility(View.INVISIBLE);
+			tu.chunk.setVisibility(View.VISIBLE);
+			su.bringToFront();
+			giu.bringToFront();
+			destra.bringToFront();
+			sinistra.bringToFront();
+		}
+	};
+	private Runnable ordiner=new Runnable()
+	{
+		public void run()
+		{
+			for(int a=0;a<tu.chunk.getChildCount();a++)
+			{
+				View v=tu.chunk.getChildAt(a);
+				if(v instanceof EntitaLan)
+				{
+					if(!(((EntitaLan)v).b instanceof Terreno))v.bringToFront();
+				}
+			}
+		}
+	};
 }

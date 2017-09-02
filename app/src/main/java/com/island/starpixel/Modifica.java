@@ -69,8 +69,9 @@ public class Modifica extends Finestra
 	}
 	public void onBackPressed()
 	{
-		Memoria.salva(cartella+schermo().blocchi.nome,nome.testo().toString());
+		Memoria.salva(cartella+schermo().blocchi.nome,nome.testo());
 		Memoria.salva(cartella+schermo().blocchi.modalita,String.valueOf(selezionato.testo().equals(schermo().lingua.creativa)));
+		menu.inizializza();
 		super.onBackPressed();
 	}
 	private View.OnClickListener copia()

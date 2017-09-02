@@ -7,13 +7,14 @@ import java.util.*;
 public class Schermata extends Finestra
 {
 	Lista<Gioco>giochi;
-	private Suono musica;
 	private boolean salva;
 	private String server,cartella;
 	private Gruppo g;
+	private Blocchi blocchi;
 	Schermata(Schermo s,String server,String cartella)
 	{
 		super(s);
+		blocchi=schermo().blocchi;
 		final int n=1;
 		this.server=server;
 		this.cartella=cartella;
@@ -31,7 +32,6 @@ public class Schermata extends Finestra
 			giochi.add(new Gioco(this,g,0,0,1,1,server,cartella,false,true));
 		}
 		g.aggiorna();
-		musica=new Suono(schermo(),schermo().blocchi.pace(schermo().blocchi.normale)).start().infinito(true);
 	}
 	public void sempre()
 	{
@@ -42,60 +42,21 @@ public class Schermata extends Finestra
 	}
 	public void sempreGrafico()
 	{
-		boolean esci=false;
+		schermo().inizioDebug(0);
 		for(Gioco g:giochi)
 		{
-			g.sempreGrafico();
+			//g.sempreGrafico();
+			g.aggiorna();
 			if(g.tu!=null)this.g.immagine(g.tu.chunk.immagine);
-			for(ChunkLan c:g.chunk)
-			{
-				for(EntitaLan e:c.entita)
-				{
-					if(e.b instanceof Intelligente)
-					{
-						Intelligente i=(Intelligente)e.b;
-						if(i.team(schermo().blocchi)!=0)
-						{
-							esci=true;
-							if(!i.boss())
-							{
-								if(schermo().blocchi.pace(musica.suono(),e.chunk.dimensione)||schermo().blocchi.pace(musica.suono(),schermo().blocchi.normale))
-								{
-									musica.rilascia();
-									musica=new Suono(schermo(),Blocchi.battaglia()).start().infinito(true);
-								}
-							}
-							else
-							{
-								if(schermo().blocchi.pace(musica.suono(),e.chunk.dimensione)||Blocchi.battaglia(musica.suono()))
-								{
-									musica.rilascia();
-									musica=new Suono(schermo(),Blocchi.boss()).start().infinito(true);
-									break;
-								}
-							}
-						}
-					}
-				}
-				if(esci)break;
-			}
-			int dimensione;
-			if(g.tu!=null)dimensione=g.tu.chunk.dimensione;
-			else dimensione=schermo().blocchi.normale;
-			if(!esci&&(Blocchi.battaglia(musica.suono())||Blocchi.boss(musica.suono())||!schermo().blocchi.pace(musica.suono(),dimensione)))
-			{
-				musica.rilascia();
-				musica=new Suono(schermo(),schermo().blocchi.pace(dimensione)).start().infinito(true);
-			}
 		}
+		schermo().fineDebug(0);
 	}
 	public void onStop()
 	{
 		if(salva)for(Gioco g:giochi)g.ripristino();
 		if(schermo().musica!=null)schermo().musica.riprendi();
-		musica.rilascia();
 		for(Gioco g:giochi)g.onStop();
-		for(Blocco b:schermo().blocchi.blocchi)
+		for(Blocco b:blocchi.blocchi)
 		{
 			schermo().cancella(b.immagine());
 			schermo().cancella(b.id+1);

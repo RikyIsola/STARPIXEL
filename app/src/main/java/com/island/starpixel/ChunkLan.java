@@ -8,6 +8,7 @@ import com.island.starpixel.blocchi.solidi.armi.*;
 import com.island.starpixel.blocchi.solidi.mobili.*;
 import com.island.starpixel.blocchi.terreni.*;
 import java.util.*;
+import android.graphics.*;
 public class ChunkLan extends Gruppo
 {
 	int x,y,luce,dimensione,immagine;
@@ -62,11 +63,19 @@ public class ChunkLan extends Gruppo
 			if(visibile&&e.x()==0&&e.y()==0)visibile=false;
 			if(e.b instanceof Solido&&!(e.b instanceof Mobile)&&e.coperto==null)for(int b=0;b<vecchi.length;b++)if(getChildAt(b)instanceof EntitaLan)
 			{
-				EntitaLan e1=(EntitaLan)getChildAt(b);
+				final EntitaLan e1=(EntitaLan)getChildAt(b);
 				if(e1.b instanceof Terreno&&e1.x()==e.x()&&e1.y()==e.y())
 				{
 					e.coperto=e1;
-					e1.setVisibility(View.INVISIBLE);
+					e.concatena(e.immagine());
+					e.immagine(e1.b.immagine());
+					schermo().runOnUiThread(new Runnable()
+					{
+						public void run()
+						{
+							e1.setVisibility(View.INVISIBLE);
+						}
+					});
 					break;
 				}
 			}
@@ -82,13 +91,20 @@ public class ChunkLan extends Gruppo
 			EntitaLan e=(EntitaLan)getChildAt(a);
 			if(e.luce!=vecchi[a])
 			{
-				e.invalidate();
+				e.colore(Color.argb(255-e.luce,0,0,0));
+				e.postInvalidate();
 			}
 		}
-		int finale;
+		final int finale;
 		if(visibile)finale=View.VISIBLE;
 		else finale=View.INVISIBLE;
-		if(centro.getVisibility()!=finale)centro.setVisibility(finale);
+		schermo().runOnUiThread(new Runnable()
+		{
+			public void run()
+			{
+				if(centro.getVisibility()!=finale)centro.setVisibility(finale);
+			}
+		});
 	}
 	void stato(String stato)
 	{
@@ -102,5 +118,13 @@ public class ChunkLan extends Gruppo
 		}
 		else if(stato.equals(b.statoNebula))immagine=R.drawable.sfondopieno;
 		else if(stato.equals(b.statoNero))immagine=0;
+	}
+	public Gruppo immagine(int immagine)
+	{
+		return this;
+	}
+	public Gruppo colore(int colore)
+	{
+		return this;
 	}
 }

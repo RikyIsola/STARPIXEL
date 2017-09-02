@@ -58,7 +58,7 @@ public class Oggetto extends View
 		if(valore<0)return 0;
 		else return valore;
 	}
-	private int immagine,concatenazione;
+	private int immagine,concatenazione,concatenazione2;
 	private int alpha=255;
 	private int colore=Color.TRANSPARENT;
 	private Schermo schermo;
@@ -139,6 +139,19 @@ public class Oggetto extends View
 	public int concatenato()
 	{
 		return concatenazione;
+	}
+	public Oggetto concatena2(int immagine)
+	{
+		int img=this.immagine;
+		immagine(immagine);
+		immagine(img);
+		concatenazione2=immagine;
+		riconcatena=true;
+		return this;
+	}
+	public int concatenato2()
+	{
+		return concatenazione2;
 	}
 	public Oggetto immagine(Bitmap immagine,int nome)
 	{
@@ -339,23 +352,25 @@ public class Oggetto extends View
 			Bitmap b=schermo.immagine(immagine);
 			if(!b.isRecycled())
 			{
-				if(schermo.esiste(concatenazione))
+				if(schermo.esiste(concatenazione)||schermo.esiste(concatenazione2))
 				{
 					Bitmap b1=schermo.immagine(concatenazione);
-					if(!b1.isRecycled())
+					Bitmap b2=schermo.immagine(concatenazione2);
+					if((b1!=null&&!b1.isRecycled())||(b2!=null&&!b2.isRecycled()))
 					{
 						if(riconcatena)
 						{
 							if(concatenato==null)
 							{
-								concatenato=Bitmap.createBitmap(100,100,Bitmap.Config.RGB_565);
+								concatenato=Bitmap.createBitmap(100,100,Bitmap.Config.ARGB_4444);
 								concatenatoc=new Canvas(concatenato);
 								scorta=new Paint();
 								scortar=new Rect(0,0,100,100);
 							}
-							concatenatoc.drawColor(Color.BLACK);
+							concatenato.eraseColor(Color.TRANSPARENT);
 							concatenatoc.drawBitmap(b,null,scortar,scorta);
-							concatenatoc.drawBitmap(b1,null,scortar,scorta);
+							if(b1!=null)concatenatoc.drawBitmap(b1,null,scortar,scorta);
+							if(b2!=null)concatenatoc.drawBitmap(b2,null,scortar,scorta);
 							riconcatena=false;
 						}
 						canvas.drawBitmap(concatenato,null,schermo().rect,schermo().paint);
@@ -377,6 +392,21 @@ public class Oggetto extends View
 		else if(schermo.esiste(concatenazione))
 		{
 			Bitmap b=schermo.immagine(concatenazione);
+			if(!b.isRecycled())
+			{
+				try
+				{
+					canvas.drawBitmap(b,null,schermo().rect,schermo().paint);
+				}
+				catch(RuntimeException e)
+				{
+					Lista.debug(e);
+				}
+			}
+		}
+		else if(schermo.esiste(concatenazione2))
+		{
+			Bitmap b=schermo.immagine(concatenazione2);
 			if(!b.isRecycled())
 			{
 				try

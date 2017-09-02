@@ -3,62 +3,20 @@ import java.lang.reflect.*;
 import java.util.*;
 public class Lista<T>extends ArrayList<T>
 {
-	public static final char puntoc=".".toCharArray()[0];
-	public static final char menoc="-".toCharArray()[0];
-	public static final char zeroc="0".toCharArray()[0];
-	public static final char unoc="1".toCharArray()[0];
-	public static final char duec="2".toCharArray()[0];
-	public static final char trec="3".toCharArray()[0];
-	public static final char quattroc="4".toCharArray()[0];
-	public static final char cinquec="5".toCharArray()[0];
-	public static final char seic="6".toCharArray()[0];
-	public static final char settec="7".toCharArray()[0];
-	public static final char ottoc="8".toCharArray()[0];
-	public static final char novec="9".toCharArray()[0];
-	public static final String punto=".";
-	public static final String at="at ";
-	public static final String tonda="(";
-	public static final String tonda2=")";
-	public static final String punti=":";
-	public static final String nativo="Native Method";
-	public static final String linea=System.lineSeparator();
-	public static final String debugNonChiuso="DEBUG NON CHIUSO ID DOVEVA ESSERE:";
-	public static final String inveceE=" INVECE È:";
-	public static final String vel="VEL:";
-	public static final String vel1=" ms MED ";
-	public static final String vel2=" ms MIN ";
-	public static final String vel3=" ms MAX ";
-	public static final String memoria=" ms RAM:";
-	public static final String memoria1=" kb MED ";
-	public static final String memoria2=" kb MIN ";
-	public static final String memoria3=" kb MAX ";
-	public static final String unita=" kb ";
-	public static final String unita2=" b";
-	public static final String risultati="DEBUGGER MANAGER RESULTS:";
-	public static final String vero="true";
-	public static final String falso="false";
-	public static final String Boolean="boolean";
-	public static final String Byte="byte";
-	public static final String Char="char";
-	public static final String Long="long";
-	public static final String Double="double";
-	public static final String Float="float";
-	public static final String Short="short";
-	public static final String Int="int";
-	public static final String huawei="HUAWEI";
-	public static final String fps="FPS:";
-	public static final String fps2="MAIN:";
-	public static final String speed="VEL:";
-	public static final String sound="SUONO:";
-	public static final String ram="RAM:";
-	public static final String garbage="GC:";
-	public static final String networkt="NETT:";
-	public static final String networkr="NETR:";
-	public static final byte lineabyte=linea.getBytes()[0];
-	public static final char lineachar=linea.charAt(0);
-	public static final String cancella="<";
 	public static double toDouble(CharSequence cs)
 	{
+		char puntoc=46;
+		char menoc=45;
+		char zeroc=48;
+		char unoc=49;
+		char duec=50;
+		char trec=51;
+		char quattroc=52;
+		char cinquec=53;
+		char seic=54;
+		char settec=55;
+		char ottoc=56;
+		char novec=57;
 		int length=cs.length();
 		boolean negativo=false;
 		boolean puntino=false;
@@ -100,6 +58,17 @@ public class Lista<T>extends ArrayList<T>
 	}
 	public static long toLong(CharSequence cs)
 	{
+		char menoc=45;
+		char zeroc=48;
+		char unoc=49;
+		char duec=50;
+		char trec=51;
+		char quattroc=52;
+		char cinquec=53;
+		char seic=54;
+		char settec=55;
+		char ottoc=56;
+		char novec=57;
 		int length=cs.length();
 		boolean negativo=false;
 		long ritorno=0;
@@ -140,6 +109,13 @@ public class Lista<T>extends ArrayList<T>
 	}
 	public static void debug(Throwable t)
 	{
+		String punto=".";
+		String at="at ";
+		String tonda="(";
+		String tonda2=")";
+		String punti=":";
+		String nativo="Native Method";
+		String linea="\n";
 		StackTraceElement[]ste=t.getStackTrace();
 		StringBuilder sb=new StringBuilder((ste.length+1)*42);
 		sb.append(t);
@@ -156,12 +132,17 @@ public class Lista<T>extends ArrayList<T>
 		System.err.println(sb);
 		if(causa!=null)debug(causa);
 	}
-	public static void breakpoint(long tempo,Object[]valori)
+	public static void breakpoint(long tempo,Object valori)
 	{
 		try
 		{
 			Thread.sleep(tempo);
-			for(Object o:valori)System.out.println(o);
+			System.out.println(valori);
+			if(valori!=null&&valori.getClass().isArray())
+			{
+				Object[]array=(Object[])valori;
+				for(Object o:array)System.out.println(o);
+			}
 		}
 		catch(InterruptedException e)
 		{
@@ -196,13 +177,15 @@ public class Lista<T>extends ArrayList<T>
 		return new Iterator()
 		{
 			int n=size();
+			int index;
 			public boolean hasNext()
 			{
-				return size()-n<size();
+				int size=size();
+				return(index=size-n)<size;
 			}
 			public Object next()
 			{
-				Object o=get(size()-n);
+				Object o=get(index);
 				n--;
 				return o;
 			}

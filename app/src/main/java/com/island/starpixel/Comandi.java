@@ -139,13 +139,14 @@ public class Comandi extends Finestra
 				chunk.antiScroll(true,true);
 				chunk.antiPiu(false);
 				chunk.max(blocchi.vista,blocchi.vista);
+				final Oggetto cop=chunk.copertura;
 				chunk.copertura=null;
 				schermo().runOnUiThread(new Runnable()
 				{
 					public void run()
 					{
-						chunk.setOnTouchListener(gioco.touch());
-						chunk.removeView(chunk.copertura);
+						chunk.setOnTouchListener(gioco.touch);
+						chunk.removeView(cop);
 					}
 				});
 			}

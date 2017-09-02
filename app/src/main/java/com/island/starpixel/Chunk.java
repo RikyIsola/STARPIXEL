@@ -59,16 +59,16 @@ public class Chunk
 					}
 					else if(secondo)
 					{
-						tempo=Integer.valueOf(cache.toString());
+						tempo=Lista.toInt(cache);
 						secondo=false;
 					}
 					else if(terzo)
 					{
-						luce=Integer.valueOf(cache.toString());
+						luce=Lista.toInt(cache);
 						terzo=false;
 						c=new Chunk(s,cartella,x,y,dimensione,tempo,luce,stato);
 					}
-					else Entita.leggi(c,cache.toString());
+					else Entita.leggi(c,cache);
 					cache.setLength(0);
 				}
 				else if(letto==-1)break;
@@ -221,14 +221,14 @@ public class Chunk
 		if(stato==b.statoQualcosa||stato==b.statoVuoto)for(Entita e:entita)
 		{
 			if((stato==b.statoQualcosa||stato==b.statoVita)&&e.b instanceof Intelligente&&((Intelligente)e.b).team(b)==b.uomini)stato=b.statoAlleati;
-			else if(stato!=b.statoGemma&&e.b==s.schermo.blocchi.Diamante)stato=b.statoGemma;
-			else if(stato!=b.statoZombie&&e.b==s.schermo.blocchi.Zombie)stato=b.statoZombie;
+			else if(stato!=b.statoGemma&&e.b==b.Diamante)stato=b.statoGemma;
+			else if(stato!=b.statoZombie&&e.b==b.Zombie)stato=b.statoZombie;
 			else if(stato!=b.statoBoss&&e.b instanceof Intelligente&&((Intelligente)e.b).boss())stato=b.statoBoss;
 			else if(stato!=b.statoNemici&&stato!=b.statoBoss&&e.b instanceof Intelligente&&((Intelligente)e.b).team(b)!=b.uomini)stato=b.statoNemici;
 			else if(stato==b.statoQualcosa&&e.b instanceof Mobile)stato=b.statoVita;
 		}
 		String file=stato+File.pathSeparator+String.valueOf(tempo)+File.pathSeparator+String.valueOf(luce)+File.pathSeparator;
-		if(!stato.equals(schermo.blocchi.statoNero))for(Entita e:entita)
+		if(!stato.equals(b.statoNero))for(Entita e:entita)
 		{
 			if(!(e.b instanceof Strumento))
 			{

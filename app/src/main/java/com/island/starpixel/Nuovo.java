@@ -92,7 +92,7 @@ public class Nuovo extends Finestra
 			public void onClick(View p1)
 			{
 				Bottone b=(Bottone)p1;
-				if(b.testo()==schermo().lingua.crea)Generatore.nuovo(schermo(),nome.testo().toString(),seme.testo().toString(),selezionato.testo().equals(modalita1.testo()));
+				if(b.testo()==schermo().lingua.crea)Generatore.nuovo(schermo(),nome.testo(),seme.testo(),Lista.uguali(selezionato.testo(),modalita1.testo()));
 				else new Schermata(schermo(),nome.testo().toString(),null);
 				cancel();
 			}

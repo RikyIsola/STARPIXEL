@@ -83,6 +83,7 @@ public class Blocchi
 	public String statoBoss="8";
 	public String statoGemma="9";
 	public String statoQuasispazio="10";
+	//public String[]listaComandi={inventariolan,selezionato,x,y,creachunk,creaentita,rottura,rimuovi,finetocco,crea,giu,su,iniziotocco,comandi,teletrasporta,eliminachunk,motori,armi,rotazione,banca,luceLan,creazione,ripristino,cambioStato};
 	public Vuoto Vuoto=new Vuoto();
 	public Erba Erba=new Erba();
 	public Giocatore Giocatore=new Giocatore();

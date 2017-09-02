@@ -28,7 +28,7 @@ public class Debugger
 		if(id!=tid)
 		{
 			final int fid=tid;
-			throw new RuntimeException(Lista.debugNonChiuso+id+Lista.inveceE+fid);
+			throw new RuntimeException("DEBUG NON CHIUSO ID DOVEVA ESSERE:"+id+" INVECE È:"+fid);
 		}
 		long delta=System.currentTimeMillis()-tempo;
 		long deltar=(r.totalMemory()-r.freeMemory()-ram)/1024;

@@ -9,6 +9,8 @@ import android.view.View.*;
 import com.island.starpixel.blocchi.*;
 import java.io.*;
 import java.net.*;
+import android.app.*;
+import android.content.*;
 public class MainActivity extends Schermo
 {
 	//S5 MINI 1.4GHZ * 4 5.6ghz
@@ -82,7 +84,7 @@ public class MainActivity extends Schermo
 	}
 	public boolean debug()
 	{
-		return false;
+		return true;
 	}
 	public boolean suoni()
 	{
@@ -112,7 +114,9 @@ public class MainActivity extends Schermo
 	}
 	protected void onCreate(Bundle savedInstanceState)
 	{
+		Lista.breakpoint(0,"PRE CREA");
 		super.onCreate(savedInstanceState);
+		Lista.breakpoint(0,"POST CREA");
 		//server.schermo(this);
 		font(Typeface.SERIF,Typeface.BOLD_ITALIC);
 		int[]dim=dimensioni();

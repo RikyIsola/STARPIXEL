@@ -53,16 +53,16 @@ public class Simulatore
 		this.cartella=cartella;
 		tempo=Lista.toLong(Memoria.leggi(cartella+Simulatore.this.schermo.blocchi.tempo));
 		seme=Lista.toDouble(Memoria.leggi(cartella+Simulatore.this.schermo.blocchi.seme));
-		creativa=Lista.uguali(Memoria.leggi(cartella+Simulatore.this.schermo.blocchi.modalita),Lista.vero);
+		creativa=Lista.uguali(Memoria.leggi(cartella+Simulatore.this.schermo.blocchi.modalita),"true");
 		zombie=Lista.toInt(Memoria.leggi(cartella+Simulatore.this.schermo.blocchi.fileZombie));
 		magon=Lista.toInt(Memoria.leggi(cartella+Simulatore.this.schermo.blocchi.fileMagon));
-		lan=new Lan(schermo)
+		lan=new Lan(schermo,25)
 		{
-			public void leggi(final StringBuilder mess,final Socket socket)
+			public void leggi(final StringBuilder messaggio,final Socket socket)
 			{
 				try
 				{
-					String messaggio=mess.toString();
+					//String messaggio=mess.toString();
 					Entita g=null;
 					int id=-1;
 					for(int a=0;a<giocatori.size();a++)if(giocatori.get(a).socket==socket)
@@ -70,7 +70,7 @@ public class Simulatore
 							g=giocatori.get(id=a);
 							break;
 						}
-					if(messaggio.equals(Simulatore.this.schermo.blocchi.crea))
+					if(g==null&&Lista.uguali(messaggio,Simulatore.this.schermo.blocchi.crea))
 					{
 						schermo().thread().post(new Runnable()
 							{
@@ -111,7 +111,7 @@ public class Simulatore
 					}
 					else if(g.primo==null)
 					{
-						if(messaggio.equals(Simulatore.this.schermo.blocchi.inventariolan))
+						if(Lista.uguali(messaggio,Simulatore.this.schermo.blocchi.inventariolan))
 						{
 							final Entita fg=g;
 							schermo().thread().post(new Runnable()
@@ -125,11 +125,11 @@ public class Simulatore
 									}
 								});
 						}
-						else if(messaggio.equals(Simulatore.this.schermo.blocchi.rotazione))
+						else if(Lista.uguali(messaggio,Simulatore.this.schermo.blocchi.rotazione))
 						{
 							rotea(g.c);
 						}
-						else if(messaggio.equals(Simulatore.this.schermo.blocchi.finetocco))
+						else if(Lista.uguali(messaggio,Simulatore.this.schermo.blocchi.finetocco))
 						{
 							if(tocchi.get(id)!=null)
 							{
@@ -146,7 +146,7 @@ public class Simulatore
 					{
 						if(g.primo.equals(Simulatore.this.schermo.blocchi.motori))
 						{
-							final int n=Integer.valueOf(messaggio.toString());
+							final int n=Lista.toInt(messaggio);
 							final Entita fg=g;
 							schermo().thread().post(new Runnable()
 								{
@@ -196,7 +196,6 @@ public class Simulatore
 											arrivo=Generatore.chunk(Simulatore.this,arrivoX,arrivoY,dimensione);
 											for(Entita e:arrivo.entita)if(e.b!=Simulatore.this.schermo.blocchi.Giocatore)e.rimuovi();
 											chunk=Lista.aggiungi(chunk,arrivo);
-											schermo().toast(arrivo.x+" "+arrivo.y+" "+arrivo.dimensione+" "+arrivo.stato);
 										}
 										if(arrivo.entita.size()==0)
 										{
@@ -224,10 +223,8 @@ public class Simulatore
 															}
 														}
 														Generatore.controllo(Simulatore.this);
-														schermo.toast("finito controllo "+giocatori.get(0).c.visibili.size());
 													}
 												});
-											schermo.toast("finito ricezione");
 										}
 									}
 								});
@@ -235,7 +232,7 @@ public class Simulatore
 						}
 						else if(g.primo.equals(Simulatore.this.schermo.blocchi.giu))
 						{
-							int n=Integer.valueOf(messaggio.toString());
+							int n=Lista.toInt(messaggio);
 							if(n==0)g.su=true;
 							else if(n==1)g.giu=true;
 							else if(n==2)g.destra=true;
@@ -244,7 +241,7 @@ public class Simulatore
 						}
 						else if(g.primo.equals(Simulatore.this.schermo.blocchi.su))
 						{
-							int n=Integer.valueOf(messaggio.toString());
+							int n=Lista.toInt(messaggio);
 							if(n==0)g.su=false;
 							else if(n==1)g.giu=false;
 							else if(n==2)g.destra=false;
@@ -253,8 +250,8 @@ public class Simulatore
 						}
 						else if(g.primo.equals(Simulatore.this.schermo.blocchi.selezionato))
 						{
-							if(creativa)g.selezionato=Simulatore.this.schermo.blocchi.blocchi[Integer.valueOf(messaggio.toString())];
-							else g.selezionato=g.inventario.get(Integer.valueOf(messaggio.toString()));
+							if(creativa)g.selezionato=Simulatore.this.schermo.blocchi.blocchi[Lista.toInt(messaggio)];
+							else g.selezionato=g.inventario.get(Lista.toInt(messaggio));
 							g.primo=null;
 						}
 						else g.secondo=messaggio.toString();
@@ -264,7 +261,7 @@ public class Simulatore
 						if(g.primo.equals(Simulatore.this.schermo.blocchi.iniziotocco))
 						{
 							double x=Double.valueOf(g.secondo);
-							double y=Double.valueOf(messaggio.toString());
+							double y=Lista.toDouble(messaggio);
 							Entita trovato=null;
 							for(Entita e:g.c.entita)if(Oggetto.toccandoBaseUguale(x,y,x,y,e.x,e.y,e.x+1,e.y+1))
 								{
@@ -304,7 +301,7 @@ public class Simulatore
 						else if(g.primo.equals(Simulatore.this.schermo.blocchi.creazione))
 						{
 							g.rimuovi(Simulatore.this.schermo.blocchi.blocchi[Integer.valueOf(g.secondo)]);
-							g.aggiungi(Simulatore.this.schermo.blocchi.blocchi[Integer.valueOf(messaggio.toString())]);
+							g.aggiungi(Simulatore.this.schermo.blocchi.blocchi[Lista.toInt(messaggio)]);
 							g.primo=null;
 							g.secondo=null;
 						}
@@ -355,7 +352,7 @@ public class Simulatore
 					{
 						if(g.primo.equals(Simulatore.this.schermo.blocchi.teletrasporta))
 						{
-							teletrasporta(Integer.valueOf(g.secondo),Integer.valueOf(g.terzo),Double.valueOf(g.quarto),Double.valueOf(g.quinto),Integer.valueOf(g.sesto),Integer.valueOf(g.settimo),Double.valueOf(g.ottavo),Double.valueOf(messaggio.toString()));
+							teletrasporta(Integer.valueOf(g.secondo),Integer.valueOf(g.terzo),Double.valueOf(g.quarto),Double.valueOf(g.quinto),Integer.valueOf(g.sesto),Integer.valueOf(g.settimo),Double.valueOf(g.ottavo),Lista.toDouble(messaggio));
 							g.primo=null;
 							g.secondo=null;
 							g.terzo=null;

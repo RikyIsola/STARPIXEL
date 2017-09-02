@@ -9,17 +9,33 @@ public abstract class Lan
 	private Lista<Socket>connessi;
 	private Lista<Processo>mandareServer,ricevereServer;
 	private Lista<OutputStream>outputServer;
+	private Lista<byte[]>outputDataServer;
+	private Lista<Integer>indexServer;
 	private Socket client;
 	private Processo accettazione,mandare,ricevere;
 	private OutputStream output;
+	private byte[]outputData;
+	private int index;
 	private Schermo schermo;
+	private byte lineabyte=10;
+	private char lineachar=10;
+	private int messaggioSize=1420;
+	public Lan(int dim)
+	{
+		this(null,dim);
+	}
+	public Lan(Schermo schermo,int dim)
+	{
+		this.schermo=schermo;
+		messaggioSize=dim;
+	}
 	public Lan()
 	{
-		this(null);
+		this(null,0);
 	}
 	public Lan(Schermo schermo)
 	{
-		this.schermo=schermo;
+		this(schermo,0);
 	}
 	public static String local()
 	{
@@ -29,6 +45,10 @@ public abstract class Lan
 	{
 		while(!s.isConnected());
 		return s.getInetAddress().getHostAddress();
+	}
+	public static int maxSize()
+	{
+		return 1420;
 	}
 	public Socket client()
 	{
@@ -65,6 +85,10 @@ public abstract class Lan
 			else ricevereServer=new Lista<Processo>();
 			if(outputServer!=null)outputServer.clear();
 			else outputServer=new Lista<OutputStream>();
+			if(outputDataServer!=null)outputDataServer.clear();
+			else outputDataServer=new Lista<byte[]>();
+			if(indexServer!=null)indexServer.clear();
+			else indexServer=new Lista<Integer>();
 			accettazione=new Processo()
 			{
 				long tempo=System.currentTimeMillis();
@@ -110,7 +134,7 @@ public abstract class Lan
 											{
 												letto=in.read();
 												if(letto==-1)throw new IOException();
-												else if(letto!=Lista.lineachar)messaggio.append((char)letto);
+												else if(letto!=lineachar)messaggio.append((char)letto);
 												else break;
 											}
 											leggi(messaggio,socket);
@@ -149,6 +173,8 @@ public abstract class Lan
 							mandareServer.add(mandare);
 							ricevereServer.add(ricevere);
 							outputServer.add(socket.getOutputStream());
+							if(messaggioSize!=0)outputDataServer.add(new byte[messaggioSize]);
+							indexServer.add(0);
 							entrato(socket);
 						}
 						catch(IOException e){}
@@ -173,6 +199,7 @@ public abstract class Lan
 				{
 					client=new Socket(ip,porta);
 					output=client.getOutputStream();
+					if(messaggioSize!=0)outputData=new byte[messaggioSize];
 					ricevere=new Processo()
 					{
 						public void esegui()
@@ -192,7 +219,7 @@ public abstract class Lan
 									{
 										letto=in.read();
 										if(letto==-1)throw new IOException();
-										else if(letto!=Lista.linea.charAt(0))messaggio.append((char)letto);
+										else if(letto!=lineachar)messaggio.append((char)letto);
 										else break;
 									}
 									leggi(messaggio,client);
@@ -334,6 +361,26 @@ public abstract class Lan
 	{
 		return manda(messaggio,false);
 	}
+	public Lan flush()
+	{
+		mandare.handler().post(new Runnable()
+			{
+				public void run()
+				{
+					try
+					{
+						index=0;
+						output.write(outputData);
+						output.flush();
+					}
+					catch(IOException e)
+					{
+						Lista.debug(e);
+					}
+				}
+			});
+		return this;
+	}
 	public Lan manda(final CharSequence messaggio,boolean blocca)
 	{
 		try
@@ -345,8 +392,27 @@ public abstract class Lan
 					{
 						try
 						{
-							for(int a=0;a<messaggio.length();a++)output.write(messaggio.charAt(a));
-							output.write(Lista.lineabyte);
+							int length=messaggio.length();
+							if(messaggioSize!=0)for(int a=0;a<=length;a++)
+							{
+								byte b;
+								if(a==length)b=lineabyte;
+								else b=(byte)messaggio.charAt(a);
+								outputData[index]=b;
+								index++;
+								if(index==outputData.length)
+								{
+									index=0;
+									output.write(outputData);
+									output.flush();
+									schermo().toast("invio");
+								}
+							}
+							else
+							{
+								for(int a=0;a<length;a++)output.write(messaggio.charAt(a));
+								output.write(lineabyte);
+							}
 							if(Lan.this.schermo!=null&&Lan.this.schermo.debug()&&Lan.this.schermo.rallentamentoConnessione()!=0)
 							{
 								mandato+=messaggio.length()+1;
@@ -362,9 +428,7 @@ public abstract class Lan
 							}
 						}
 						catch(IOException e)
-						{
-							Lista.debug(e);
-						}
+						{}
 					}
 				});
 		}
@@ -374,11 +438,11 @@ public abstract class Lan
 		}
 		return this;
 	}
-	public Lan manda(final String messaggio,final Socket socket)
+	public Lan manda(final CharSequence messaggio,final Socket socket)
 	{
 		return manda(messaggio,socket,false);
 	}
-	public Lan manda(final String messaggio,final Socket socket,boolean blocca)
+	public Lan manda(final CharSequence messaggio,final Socket socket,boolean blocca)
 	{
 		try
 		{
@@ -395,8 +459,28 @@ public abstract class Lan
 						{
 							try
 							{
-								outputServer.get(fid).write(messaggio.getBytes());
-								outputServer.get(fid).write(Lista.lineabyte);
+								int length=messaggio.length();
+								if(messaggioSize!=0)for(int a=0;a<=length;a++)
+								{
+									int index=indexServer.get(fid);
+									byte b;
+									if(a==length)b=lineabyte;
+									else b=(byte)messaggio.charAt(a);
+									outputDataServer.get(fid)[index]=b;
+									index++;
+									if(index==outputDataServer.get(fid).length)
+									{
+										indexServer.set(fid,0);
+										outputServer.get(fid).write(outputDataServer.get(fid));
+										outputServer.get(fid).flush();
+									}
+									else indexServer.set(fid,index);
+								}
+								else
+								{
+									for(int a=0;a<length;a++)outputServer.get(fid).write(messaggio.charAt(a));
+									outputServer.get(fid).write(lineabyte);
+								}
 								if(Lan.this.schermo!=null&&Lan.this.schermo.debug()&&Lan.this.schermo.rallentamentoConnessione()!=0)
 								{
 									mandatoServer+=messaggio.length()+1;

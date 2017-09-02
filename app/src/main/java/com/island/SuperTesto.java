@@ -7,12 +7,14 @@ public class SuperTesto extends Oggetto
 	private Paint.Align textAlign=Paint.Align.CENTER;
 	private Typeface typeface;
 	private double textX=0.5;
-	StringBuilder cache=new StringBuilder();
+	private StringBuilder cache=new StringBuilder();
+	private StringBuilder testosb=new StringBuilder();
+	private StringBuilder aggiunta=new StringBuilder();
+	private StringBuilder riga=new StringBuilder();
 	private double larghezzaX=1;
 	private double carattere=1;
-	private Lista<String>finale=new Lista<String>();
-	private char linea=riga().charAt(0);
-	private String vuoto="";
+	private StringBuilder finale=new StringBuilder();
+	private char linea=38;
 	private String spazio=" ";
 	public SuperTesto(Gruppo gruppo,double x,double y,double larghezza,double altezza,CharSequence testo,int colore,final int sfondo)
 	{
@@ -65,7 +67,14 @@ public class SuperTesto extends Oggetto
 		if(typeface!=null)schermo().paint.setTypeface(typeface);
 		schermo().paint.setTextSize((float)(tall()*unitaY()*carattere));
 		schermo().paint.setTextScaleX((float)(unitaX()/unitaY()*larghezzaX));
-		for(int a=0;a<finale.size();a++)if(finale.get(a)!=null)canvas.drawText(finale.get(a),(float)(canvas.getWidth()*textX),(a+1)*schermo().paint.getTextSize(),schermo().paint);
+		int index=0;
+		int punto=0;
+		for(int a=0;a<finale.length();a++)if(finale.charAt(a)==linea)
+		{
+			canvas.drawText(finale,index,a,(float)(canvas.getWidth()*textX),(punto+1)*schermo().paint.getTextSize(),schermo().paint);
+			index=a+1;
+			punto++;
+		}
 	}
 	public CharSequence testo()
 	{
@@ -107,61 +116,58 @@ public class SuperTesto extends Oggetto
 	{
 		public void run()
 		{
-			finale.clear();
-			String aggiunta=vuoto;
+			finale.setLength(0);
+			aggiunta.setLength(0);
 			cache.setLength(0);
-			String testo=cache.append(SuperTesto.this.testo).append(spazio).toString();
-			cache.setLength(0);
+			testosb.setLength(0);
+			testosb.append(SuperTesto.this.testo).append(spazio);
 			schermo().paint.setTextSize((float)(tall()*unitaY()*carattere));
 			schermo().paint.setTextScaleX((float)(unitaX()/unitaY()*larghezzaX));
 			int a=0;
-			while(a<testo.length())
+			while(a<testosb.length())
 			{
 				float somma=schermo().paint.measureText(aggiunta,0,aggiunta.length());
-				while(a<testo.length())
+				while(a<testosb.length())
 				{
 					cache.setLength(0);
 					while(true)
 					{
-						char c=testo.charAt(a);
+						char c=testosb.charAt(a);
 						a++;
 						if(c==spazio.charAt(0))break;
 						else cache.append(c);
 					}
-					String nuovo=cache.toString().concat(spazio);
-					somma+=schermo().paint.measureText(nuovo);
-					if(somma>=large()*unitaX()||!(a<testo.length()))
+					cache.append(spazio);
+					somma+=schermo().paint.measureText(cache,0,cache.length());
+					if(somma>=large()*unitaX()||!(a<testosb.length()))
 					{
 						boolean esiste=false;
 						int lunghezza=0;
-						
 						for(int b=0;b<aggiunta.length();b++)if(aggiunta.charAt(b)==linea)
 							{
 								esiste=true;
 								lunghezza=b;
-								String riga=aggiunta.substring(0,lunghezza);
-								/*char[]avanzi=new char[aggiunta.length()-riga.length()];
-								 for(int c=1;c<avanzi.length;c++)avanzi[c]=aggiunta.charAt(riga.length()+c);
-								 String altro=new String(avanzi)+nuovo;*/
-								String altro=aggiunta.substring(riga.length()+1,aggiunta.length()).concat(nuovo);
-								nuovo=vuoto;
-								aggiunta=altro;
-								finale.add(riga);
+								riga.setLength(0);
+								riga.append(aggiunta);
+								riga.delete(lunghezza,riga.length());
+								finale.append(riga).append(linea);
+								aggiunta.delete(0,riga.length()+1).append(cache);
 								b=0;
 								break;
 							}
 						if(esiste)break;
 						else
 						{
-							finale.add(aggiunta);
-							aggiunta=nuovo;
+							finale.append(aggiunta).append(linea);
+							aggiunta.setLength(0);
+							aggiunta.append(cache);
 							break;
 						}
 					}
-					else aggiunta+=nuovo;
+					else aggiunta.append(cache);
 				}
 			}
-			finale.add(aggiunta);
+			finale.append(aggiunta).append(linea);
 			invalidate();
 		}
 	};

@@ -36,9 +36,9 @@ public class Schermo extends Activity
 	{
 		if(debug())
 		{
-			if(Lista.huawei.equals(Build.MANUFACTURER))try
+			if("HUAWEI".equals(Build.MANUFACTURER))try
 			{
-				PrintStream out=new PrintStream(new FileOutputStream(Environment.getExternalStorageDirectory().toString().concat("/AppProjects/.nomedia")));
+				PrintStream out=new PrintStream(new File(Environment.getExternalStorageDirectory(),"/AppProjects/.nomedia"));
 				System.setOut(out);
 				System.setErr(out);
 			}
@@ -87,13 +87,13 @@ public class Schermo extends Activity
 		sb.append(t);
 		for(StackTraceElement el:ste)
 		{
-			sb.append(Lista.linea).append(Lista.at).append(el.getClassName()).append(Lista.punto).append(el.getMethodName()).append(Lista.tonda);
+			sb.append(linea).append(at).append(el.getClassName()).append(punto).append(el.getMethodName()).append(tonda);
 			int n=el.getLineNumber();
-			if(n==-2)sb.append(Lista.nativo);
-			else sb.append(el.getFileName()).append(Lista.punti).append(n);
-			sb.append(Lista.tonda2);
+			if(n==-2)sb.append(nativo);
+			else sb.append(el.getFileName()).append(punti).append(n);
+			sb.append(tonda2);
 		}
-		toast(sb.toString());
+		toast(sb);
 	}
 	public void font(Typeface typeface,int type)
 	{
@@ -128,6 +128,13 @@ public class Schermo extends Activity
 	private Runtime runtime=Runtime.getRuntime();
 	private boolean sotto;
 	private Random scimmia=new Random();
+	private String punto=".";
+	private String at="at ";
+	private String tonda="(";
+	private String tonda2=")";
+	private String punti=":";
+	private String nativo="Native Method";
+	private String linea="\n";
 	private Runnable garbageCollector=new Runnable()
 	{
 		public void run()
@@ -393,6 +400,14 @@ public class Schermo extends Activity
 				private StringBuilder sb=new StringBuilder(11);
 				private long ramVecchia;
 				private int max;
+				private String fps="FPS:";
+				private String fps2="MAIN:";
+				private String speed="VEL:";
+				private String sound="SUONO:";
+				private String ram="RAM:";
+				private String garbage="GC:";
+				private String networkt="NETT:";
+				private String networkr="NETR:";
 				public void onDraw(Canvas c)
 				{
 					max=c.getWidth();
@@ -404,23 +419,23 @@ public class Schermo extends Activity
 					paint.setColor(Color.WHITE);
 					paint.setTextAlign(Paint.Align.LEFT);
 					sb.setLength(0);
-					c.drawText(sb.append(Lista.fps).append(frame()),0,sb.length(),0,c.getHeight()/10,paint);
+					c.drawText(sb.append(fps).append(frame()),0,sb.length(),0,c.getHeight()/10,paint);
 					sb.setLength(0);
-					c.drawText(sb.append(Lista.fps2).append(frame2()),0,sb.length(),0,c.getHeight()/10*3,paint);
+					c.drawText(sb.append(fps2).append(frame2()),0,sb.length(),0,c.getHeight()/10*3,paint);
 					sb.setLength(0);
-					c.drawText(sb.append(Lista.speed).append(velocita()),0,sb.length(),0,c.getHeight()/10*5,paint);
+					c.drawText(sb.append(speed).append(velocita()),0,sb.length(),0,c.getHeight()/10*5,paint);
 					sb.setLength(0);
-					c.drawText(sb.append(Lista.sound).append(velocitaSuono()),0,sb.length(),0,c.getHeight()/10*7,paint);
+					c.drawText(sb.append(sound).append(velocitaSuono()),0,sb.length(),0,c.getHeight()/10*7,paint);
 					paint.setTextAlign(Paint.Align.RIGHT);
 					sb.setLength(0);
 					long ramNuova=ram();
-					if(ramVecchia!=ramNuova)c.drawText(sb.append(Lista.ram).append(ram()).append(File.separator).append(ramGiusta()),0,sb.length(),c.getWidth(),c.getHeight()/10,paint);
+					if(ramVecchia!=ramNuova)c.drawText(sb.append(ram).append(ram()).append(File.separator).append(ramGiusta()),0,sb.length(),c.getWidth(),c.getHeight()/10,paint);
 					sb.setLength(0);
-					c.drawText(sb.append(Lista.garbage).append(gc()),0,sb.length(),c.getWidth(),c.getHeight()/10*3,paint);
+					c.drawText(sb.append(garbage).append(gc()),0,sb.length(),c.getWidth(),c.getHeight()/10*3,paint);
 					sb.setLength(0);
-					c.drawText(sb.append(Lista.networkt).append(trasferito()),0,sb.length(),c.getWidth(),c.getHeight()/10*5,paint);
+					c.drawText(sb.append(networkt).append(trasferito()),0,sb.length(),c.getWidth(),c.getHeight()/10*5,paint);
 					sb.setLength(0);
-					c.drawText(sb.append(Lista.networkr).append(ricevuto()),0,sb.length(),c.getWidth(),c.getHeight()/10*7,paint);
+					c.drawText(sb.append(networkr).append(ricevuto()),0,sb.length(),c.getWidth(),c.getHeight()/10*7,paint);
 				}
 				public boolean onTouchEvent(MotionEvent e)
 				{
@@ -442,6 +457,7 @@ public class Schermo extends Activity
 	protected void onDestroy()
 	{
 		super.onDestroy();
+		for(Finestra finestra:finestre)finestra.cancel();
 		for(Suono suono:suoni)suono.cancella();
 		h=null;
 		runnable=null;
@@ -459,7 +475,6 @@ public class Schermo extends Activity
 		suono.chiudi();
 		suono=null;
 		suoni=null;
-		for(Finestra finestra:finestre)finestra.cancel();
 		finestre=null;
 		for(Bitmap bitmap:caricati)bitmap.recycle();
 		caricati=null;
@@ -479,6 +494,13 @@ public class Schermo extends Activity
 		view=null;
 		if(dm!=null)dm.finito();
 		dm=null;
+		punto=null;
+		at=null;
+		tonda=null;
+		tonda2=null;
+		punti=null;
+		nativo=null;
+		linea=null;
 		runtime.runFinalization();
 		runtime.gc();
 		runtime=null;
@@ -655,6 +677,7 @@ public class Schermo extends Activity
 	}
 	public boolean esiste(int risorsa,int x,int y)
 	{
+		if(risorsa==0)return false;
 		for(int a=0;a<risorse.size();a++)
 		{
 			Rect p=risorse.get(a);
@@ -664,6 +687,7 @@ public class Schermo extends Activity
 	}
 	public boolean esiste(int risorsa)
 	{
+		if(risorsa==0)return false;
 		for(Rect p:risorse)if(p.right==risorsa)return true;
 		return false;
 	}

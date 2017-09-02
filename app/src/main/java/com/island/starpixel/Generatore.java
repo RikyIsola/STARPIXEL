@@ -7,7 +7,7 @@ import java.util.*;
 import android.graphics.*;
 public class Generatore
 {
-	static void nuovo(MainActivity schermo,String nome,String seme,boolean creativa)
+	static void nuovo(MainActivity schermo,CharSequence nome,CharSequence seme,boolean creativa)
 	{
 		if(nome.length()==0)nome=schermo.lingua.nuovoUniverso;
 		if(seme.length()==0)seme=String.valueOf(new Random().nextInt());

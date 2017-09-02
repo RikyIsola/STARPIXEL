@@ -38,25 +38,25 @@ public class Entita
 	Point obiettivo;
 	static int giocatoreChunkX(Blocchi b,String cartella,String ip)
 	{
-		return Integer.valueOf(Memoria.leggi(cartella+ip+File.separator+b.chunkx).toString());
+		return Lista.toInt(Memoria.leggi(cartella+ip+File.separator+b.chunkx));
 	}
 	static int giocatoreChunkY(Blocchi b,String cartella,String ip)
 	{
-		return Integer.valueOf(Memoria.leggi(cartella+ip+File.separator+b.chunky).toString());
+		return Lista.toInt(Memoria.leggi(cartella+ip+File.separator+b.chunky));
 	}
 	static int giocatoreDimensione(Blocchi b,String cartella,String ip)
 	{
-		return Integer.valueOf(Memoria.leggi(cartella+ip+File.separator+b.dimensione).toString());
+		return Lista.toInt(Memoria.leggi(cartella+ip+File.separator+b.dimensione));
 	}
 	static Entita crea(Chunk c,double x,double y,double vita,Blocco b)
 	{
 		return new Entita(c,x,y,vita,b,new Lista<Blocco>(),null,false,null);
 	}
-	static Entita leggi(Chunk c,String file)
+	static Entita leggi(Chunk c,StringBuilder file)
 	{
 		char divisore="&".charAt(0);
-		char[]lista=file.toCharArray();
-		String cache="";
+		//char[]lista=file.toCharArray();
+		StringBuilder cache=new StringBuilder();
 		double x=0;
 		double y=0;
 		double vita=0;
@@ -66,23 +66,25 @@ public class Entita
 		boolean secondo=true;
 		boolean terzo=true;
 		boolean quarto=true;
-		for(int a=0;a<lista.length;a++)
+		int length=file.length();
+		for(int a=0;a<length;a++)
 		{
-			if(lista[a]==divisore)
+			char lista=file.charAt(a);
+			if(lista==divisore)
 			{
 				if(primo)
 				{
-					x=Double.valueOf(cache);
+					x=Lista.toDouble(cache);
 					primo=false;
 				}
 				else if(secondo)
 				{
-					y=Double.valueOf(cache);
+					y=Lista.toDouble(cache);
 					secondo=false;
 				}
 				else if(terzo)
 				{
-					vita=Double.valueOf(cache);
+					vita=Lista.toDouble(cache);
 					terzo=false;
 				}
 				else if(quarto)
@@ -91,9 +93,9 @@ public class Entita
 					quarto=false;
 				}
 				else inventario=Lista.aggiungi(inventario,c.schermo.blocchi.trova(cache));
-				cache="";
+				cache.setLength(0);
 			}
-			else cache+=new String(new char[]{lista[a]});
+			else cache.append(lista);
 		}
 		return new Entita(c,x,y,vita,b,inventario,null,false,null);
 	}
@@ -596,14 +598,14 @@ public class Entita
 	{
 		if(cartella==null)
 		{
-			String ritorno=x+"&"+y+"&"+vita+"&"+this.b.nomeInglese+"&";
+			String ritorno=xvecchio+"&"+yvecchio+"&"+vita+"&"+this.b.nomeInglese+"&";
 			for(Blocco bi:inventario)ritorno+=bi.nomeInglese+"&";
 			return ritorno;
 		}
 		else
 		{
-			Memoria.salva(cartella+b.x,String.valueOf(x));
-			Memoria.salva(cartella+b.y,String.valueOf(y));
+			Memoria.salva(cartella+b.x,xvecchio);
+			Memoria.salva(cartella+b.y,yvecchio);
 			Memoria.salva(cartella+b.vita,String.valueOf(vita));
 			String inv=cartella+b.inventario+File.separator;
 			for(int a=0;a<inventario.size();a++)

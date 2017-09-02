@@ -10,6 +10,30 @@ public class DebuggerManager
 			loop();
 		}
 	};
+	private String Boolean="boolean";
+	private String Byte="byte";
+	private String Char="char";
+	private String Long="long";
+	private String Double="double";
+	private String Float="float";
+	private String Short="short";
+	private String Int="int";
+	private String risultati="DEBUGGER MANAGER RESULTS:";
+	private String vel="VEL:";
+	private String vel1=" ms MED ";
+	private String vel2=" ms MIN ";
+	private String vel3=" ms MAX ";
+	private String memoria=" ms RAM:";
+	private String memoria1=" kb MED ";
+	private String memoria2=" kb MIN ";
+	private String memoria3=" kb MAX ";
+	private String unita=" kb ";
+	private String unita2=" b";
+	private String at="at ";
+	private String tonda="(";
+	private String tonda2=")";
+	private String punti=":";
+	private String punto=".";
 	private Lista<Lista<StackTraceElement>>elementi=new Lista<Lista<StackTraceElement>>();
 	private Lista<Thread>thread=new Lista<Thread>();
 	private Lista<Lista<Debugger>>debug=new Lista<Lista<Debugger>>();
@@ -130,14 +154,14 @@ public class DebuggerManager
 				String s=cl.getName();
 				if(cl.isPrimitive())
 				{
-					if(s.equals(Lista.Boolean))ritorno+=4;
-					else if(s.equals(Lista.Byte))ritorno+=4;
-					else if(s.equals(Lista.Char))ritorno+=4;
-					else if(s.equals(Lista.Short))ritorno+=4;
-					else if(s.equals(Lista.Int))ritorno+=4;
-					else if(s.equals(Lista.Float))ritorno+=4;
-					else if(s.equals(Lista.Long))ritorno+=8;
-					else if(s.equals(Lista.Double))ritorno+=8;
+					if(s.equals(Boolean))ritorno+=4;
+					else if(s.equals(Byte))ritorno+=4;
+					else if(s.equals(Char))ritorno+=4;
+					else if(s.equals(Short))ritorno+=4;
+					else if(s.equals(Int))ritorno+=4;
+					else if(s.equals(Float))ritorno+=4;
+					else if(s.equals(Long))ritorno+=8;
+					else if(s.equals(Double))ritorno+=8;
 				}
 				else ritorno+=4;
 			}
@@ -155,12 +179,12 @@ public class DebuggerManager
 			{
 				StringBuilder sb=new StringBuilder(nomi.size()*100);
 				String linea=System.lineSeparator();
-				sb.append(Lista.risultati).append(linea);
+				sb.append(risultati).append(linea);
 				int length=metodi.size();
 				for(int a=0;a<length;a++)
 				{
 					String classe=nomi.get(a);
-					sb.append(classe).append(Lista.punti).append(dimensioni.get(a)).append(Lista.unita2).append(linea);
+					sb.append(classe).append(punti).append(dimensioni.get(a)).append(unita2).append(linea);
 					Lista<String>pezzo=metodi.get(a);
 					Lista<String>file=files.get(a);
 					Lista<String>nlinea=nlinee.get(a);
@@ -179,7 +203,7 @@ public class DebuggerManager
 						long rmin=rammin.get(b);
 						long rmax=rammax.get(b);
 						long rmed=rammed.get(b);
-						sb.append(Lista.at).append(classe).append(Lista.punto).append(pezzo.get(b)).append(Lista.tonda).append(Lista.vel).append((tmax+tmin+tmed)/3).append(Lista.vel1).append(tmed).append(Lista.vel2).append(tmin).append(Lista.vel3).append(tmax).append(Lista.memoria).append((rmax+rmin+rmed)/3).append(Lista.memoria1).append(rmed).append(Lista.memoria2).append(rmin).append(Lista.memoria3).append(rmax).append(Lista.unita).append(file.get(b)).append(Lista.punti).append(nlinea.get(b)).append(Lista.tonda2).append(linea);
+						sb.append(at).append(classe).append(punto).append(pezzo.get(b)).append(tonda).append(vel).append((tmax+tmin+tmed)/3).append(vel1).append(tmed).append(vel2).append(tmin).append(vel3).append(tmax).append(memoria).append((rmax+rmin+rmed)/3).append(memoria1).append(rmed).append(memoria2).append(rmin).append(memoria3).append(rmax).append(unita).append(file.get(b)).append(punti).append(nlinea.get(b)).append(tonda2).append(linea);
 					}
 				}
 				System.out.print(sb);

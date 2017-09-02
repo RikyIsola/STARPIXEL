@@ -18,9 +18,7 @@ public class EntitaLan extends Oggetto
 	int img,luce,luminosita;
 	final int riduzione;
 	private boolean layout;
-	private Paint paint=new Paint();
 	EntitaLan coperto;
-	private Bitmap disegno;
 	/*Bitmap cache;
 	Canvas cachecanvas;*/
 	EntitaLan(final ChunkLan c,double x,double y,Blocco b)
@@ -95,6 +93,7 @@ public class EntitaLan extends Oggetto
 			img=R.drawable.rottura3;
 			if(b==chunk.gioco.schermo().blocchi.Zombie)new Suono(schermo(),R.raw.zombie_attack).start();
 		}
+		concatena2(img);
 		schermo().runOnUiThread(invalida);
 	}
 	int rottura()
@@ -136,13 +135,7 @@ public class EntitaLan extends Oggetto
 		{
 			if(Oggetto.distanza(x(),y(),larghezza(),altezza(),chunk.transX(),chunk.transY(),chunk.maxX()+chunk.transX(),chunk.maxY()+chunk.transY())>0)
 			{
-				if(!(b instanceof Scudi))schermo().runOnUiThread(new Runnable()
-				{
-					public void run()
-					{
-						chunk.removeView(EntitaLan.this);
-					}
-				});
+				if(!(b instanceof Scudi))schermo().runOnUiThread(rimuovi);
 				layout=false;
 			}
 		}
@@ -150,19 +143,18 @@ public class EntitaLan extends Oggetto
 		{
 			if(Oggetto.distanza(x(),y(),larghezza(),altezza(),chunk.transX(),chunk.transY(),chunk.maxX()+chunk.transX(),chunk.maxY()+chunk.transY())<=0)
 			{
-				if(!(b instanceof Scudi))schermo().runOnUiThread(new Runnable()
-					{
-						public void run()
-						{
-							chunk.addView(EntitaLan.this);
-							chunk.gioco.ordine=true;
-						}
-					});
+				if(!(b instanceof Scudi))schermo().runOnUiThread(aggiungi);
 				layout=true;
 			}
 		}
 	}
 	public void onDraw(Canvas canvas)
+	{
+		schermo().inizioDebug(1);
+		super.onDraw(canvas);
+		schermo().fineDebug(1);
+	}
+	/*public void onDraw(Canvas canvas)
 	{
 		//super.onDraw(canvas);
 		paint.reset();
@@ -247,7 +239,7 @@ public class EntitaLan extends Oggetto
 						 {
 						 int alpha=Color.alpha(bitmap.getPixel(x,y));
 						 if(alpha!=0)bitmap.setPixel(x,y,Color.argb(alpha,0,0,0));
-						 }*/
+						 }
 					}
 				}
 				else
@@ -257,18 +249,13 @@ public class EntitaLan extends Oggetto
 				}
 			}
 		}
-	}
+	}*/
 	public void rimosso()
 	{
 		if(coperto!=null)
 		{
 			final EntitaLan e=coperto;
 			coperto=null;
-			if(disegno!=null)
-			{
-				disegno.recycle();
-				disegno=null;
-			}
 			schermo().runOnUiThread(new Runnable()
 				{
 					public void run()
@@ -297,12 +284,9 @@ public class EntitaLan extends Oggetto
 		if(coperto!=null)
 		{
 			final EntitaLan e=coperto;
+			immagine(concatenato());
+			concatena(0);
 			coperto=null;
-			if(disegno!=null)
-			{
-				disegno.recycle();
-				disegno=null;
-			}
 			schermo().runOnUiThread(new Runnable()
 				{
 					public void run()
@@ -319,11 +303,8 @@ public class EntitaLan extends Oggetto
 		{
 			final EntitaLan e=coperto;
 			coperto=null;
-			if(disegno!=null)
-			{
-				disegno.recycle();
-				disegno=null;
-			}
+			immagine(concatenato());
+			concatena(0);
 			schermo().runOnUiThread(new Runnable()
 				{
 					public void run()
@@ -334,4 +315,19 @@ public class EntitaLan extends Oggetto
 		}
 		return super.y(y);
 	}
+	private Runnable rimuovi=new Runnable()
+	{
+		public void run()
+		{
+			chunk.removeView(EntitaLan.this);
+		}
+	};
+	private Runnable aggiungi=new Runnable()
+	{
+		public void run()
+		{
+			chunk.addView(EntitaLan.this);
+			chunk.gioco.ordine=true;
+		}
+	};
 }
