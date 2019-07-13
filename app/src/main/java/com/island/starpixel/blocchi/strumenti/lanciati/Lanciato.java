@@ -3,8 +3,8 @@ import com.island.starpixel.*;
 import com.island.starpixel.blocchi.strumenti.*;
 public abstract class Lanciato extends Strumento
 {
-	public abstract int danno()
-	public abstract int proiettile()
+	public abstract int danno();
+	public abstract int proiettile();
 	public boolean luminoso()
 	{
 		return true;

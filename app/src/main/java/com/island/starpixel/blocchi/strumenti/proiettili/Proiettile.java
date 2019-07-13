@@ -3,8 +3,8 @@ import com.island.starpixel.blocchi.solidi.*;
 import com.island.starpixel.blocchi.strumenti.*;
 public abstract class Proiettile extends Strumento
 {
-	public abstract double velocita()
-	public abstract int potenza()
+	public abstract double velocita();
+	public abstract int potenza();
 	public String descrizioneItaliano()
 	{
 		return"LO SPARI CONTRO I TUOI NEMICI CON LE ARMI";

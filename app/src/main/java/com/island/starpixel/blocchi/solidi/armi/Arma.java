@@ -4,7 +4,7 @@ import com.island.starpixel.blocchi.solidi.*;
 import com.island.starpixel.blocchi.strumenti.proiettili.*;
 public abstract class Arma extends Solido
 {
-	public abstract Proiettile siluro(Blocchi b)
+	public abstract Proiettile siluro(Blocchi b);
 	public String descrizioneItaliano()
 	{
 		return"POSIZIONALO DA QUALCHE PARTE E USA LA CONSOLE DI COMANDO PER SPARARE";

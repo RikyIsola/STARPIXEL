@@ -84,7 +84,7 @@ public class MainActivity extends Schermo
 	}
 	public boolean debug()
 	{
-		return true;
+		return false;
 	}
 	public boolean suoni()
 	{
@@ -96,7 +96,7 @@ public class MainActivity extends Schermo
 	}
 	public boolean debugger()
 	{
-		return true;
+		return false;
 	}
 	public int rallentamento()
 	{

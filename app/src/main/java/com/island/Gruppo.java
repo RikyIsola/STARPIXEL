@@ -188,7 +188,7 @@ public class Gruppo extends ViewGroup
 				{
 					final View oggetto=getChildAt(a);
 					final Info info=(Info)oggetto.getLayoutParams();
-					final double x,y,altezza,larghezza;
+					double x,y,altezza,larghezza;
 					if(!info.antiTransX)x=-transX+info.transX*unitaX;
 					else x=0;
 					if(!info.antiTransY)y=-transY+info.transY*unitaY;

@@ -4,8 +4,8 @@ import com.island.starpixel.blocchi.*;
 import com.island.starpixel.blocchi.strumenti.lanciati.*;
 public abstract class Intelligente extends Ai
 {
-	public abstract int team(Blocchi b)
-	public abstract Lanciato arma(Blocchi b)
+	public abstract int team(Blocchi b);
+	public abstract Lanciato arma(Blocchi b);
 	public int suono()
 	{
 		return 0;

@@ -2,12 +2,12 @@ package com.island.starpixel.blocchi;
 public abstract class Blocco
 {
 	public int id;
-	public abstract int immagine()
-	public abstract String nomeItaliano()
-	public abstract String nomeInglese()
-	public abstract String descrizioneItaliano()
-	public abstract String descrizioneInglese()
-	public abstract int vita()
+	public abstract int immagine();
+	public abstract String nomeItaliano();
+	public abstract String nomeInglese();
+	public abstract String descrizioneItaliano();
+	public abstract String descrizioneInglese();
+	public abstract int vita();
 	public String nomeItaliano,nomeInglese,descrizioneItaliano,descrizioneInglese,ids;
 	public Blocco[]prodotti;
 	public int forza()
